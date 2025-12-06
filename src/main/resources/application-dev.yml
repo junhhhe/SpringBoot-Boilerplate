@@ -4,25 +4,20 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
     show-sql: true
-
+  
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-
+  
   jwt:
     secret: ${JWT_SECRET}
     accessTokenExpiration: ${JWT_ACCESS_EXP}
@@ -31,11 +26,10 @@ spring:
 springdoc:
   swagger-ui:
     path: /api-docs
-    groups-order: DESC
     tags-sorter: alpha
     operations-sorter: method
   api-docs:
-    path: /api
+    path: /v3/api-docs
 
 server:
   port: 8000
@@ -45,5 +39,3 @@ server:
 logging:
   level:
     org.springframework: info
-    org.hibernate.SQL: INFO
-    org.hibernate.type: off
