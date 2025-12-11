@@ -23,17 +23,31 @@ public class RedisService {
         );
     }
 
-    // RefreshToken 조회
+    /**
+     * 저장된 Refresh Token 조회
+     * 
+     * @param userId 사용자 ID
+     * @return 저장된 Refresh Token, 없으면 null
+     */
     public String getRefreshToken(Long userId) {
         return redisTemplate.opsForValue().get(REFRESH_TOKEN_PREFIX + userId);
     }
 
-    // RefreshToken 삭제
+    /**
+     * 저장된 Refresh Token 삭제
+     * 
+     * @param userId 사용자 ID
+     */
     public void deleteRefreshToken(Long userId) {
         redisTemplate.delete(REFRESH_TOKEN_PREFIX + userId);
     }
 
-    // 키 존재 여부 확인
+    /**
+     * Refresh Token 키의 존재 여부 확인
+     * 
+     * @param userId 사용자 ID
+     * @return 키가 존재하면 true, 없으면 false
+     */
     public boolean hasKey(Long userId) {
         return redisTemplate.hasKey(REFRESH_TOKEN_PREFIX + userId);
     }

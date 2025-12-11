@@ -13,6 +13,12 @@ import springboot.boilerplate.global.common.BaseResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * CustomException 처리
+     * 
+     * @param e 발생한 CustomException
+     * @return 에러 응답
+     */
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<BaseResponse<Void>> handleCustomException(CustomException e) {
         log.error("[CustomException] {}", e.getMessage());
@@ -21,6 +27,13 @@ public class GlobalExceptionHandler {
                 .body(BaseResponse.error(e.getErrorCode().getMessage(), e.getErrorCode().getHttpStatus()));
     }
 
+    /**
+     *
+     * @Valid 어노테이션으로 검증 실패 시 발생하는 예외 처리
+     * 
+     * @param e 발생한 MethodArgumentNotValidException
+     * @return 에러 응답
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
         log.warn("[ValidationException] {}", e.getMessage());
@@ -35,6 +48,13 @@ public class GlobalExceptionHandler {
                 .body(BaseResponse.error(errorMessage, ErrorCode.INVALID_REQUEST.getHttpStatus()));
     }
 
+    /**
+     * 
+     * 메서드 파라미터나 반환값의 제약 조건 위반 시 발생하는 예외 처리
+     * 
+     * @param e 발생한 ConstraintViolationException
+     * @return 에러 응답
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<BaseResponse<Void>> handleConstraintViolationException(ConstraintViolationException e) {
         log.warn("[ConstraintViolationException] {}", e.getMessage());
@@ -48,6 +68,12 @@ public class GlobalExceptionHandler {
                 .body(BaseResponse.error(errorMessage, ErrorCode.INVALID_REQUEST.getHttpStatus()));
     }
 
+    /**
+     * 예상치 못한 예외 처리
+     * 
+     * @param e 발생한 예외
+     * @return 에러 응답
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<Void>> handleUnexpectedException(Exception e) {
         log.error("[UnexpectedException]", e);

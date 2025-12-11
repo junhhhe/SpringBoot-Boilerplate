@@ -21,7 +21,7 @@ import springboot.boilerplate.global.security.JwtAuthenticationFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    // authManager Bean을 얻기 위한 authConfiguration 객체
+    // 인증 관리자 Bean을 얻기 위한 설정 객체 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
 
@@ -30,21 +30,32 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // get authManager
+    /**
+     * AuthenticationManager Bean 생성
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * SecurityFilterChain을 구성
+     * 
+     * JWT 기반 인증을 위한 필터 체인을 설정
+     * CSRF 비활성화, 세션 무상태(STATELESS) 설정, 인증 필터 등록
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // CSRF Disable
+        // CSRF 비활성화 (JWT 사용 시 불필요)
         http
-                .csrf(AbstractHttpConfigurer::disable)  // Session login disable
-                .formLogin(AbstractHttpConfigurer::disable)  // UsernamePasswordAuthenticationFilter disable
-                .httpBasic(AbstractHttpConfigurer::disable)   // 기본 로그인창 disable
-                // 세션 정보를 저장하지 않음(jwt에서는 임시 세션 정보 사용, 사용된 세션은 이후 초기화)
+                .csrf(AbstractHttpConfigurer::disable)
+                // 폼 로그인 비활성화
+                .formLogin(AbstractHttpConfigurer::disable)
+                // HTTP Basic 인증 비활성화 (기본 로그인창 비활성화)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                // 세션 무상태 설정 (JWT에서는 세션을 사용하지 않음)
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 요청 인가 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api-docs/**",
@@ -57,13 +68,14 @@ public class SecurityConfig {
                         .requestMatchers("/onlyuser").hasRole("USER")
                         .anyRequest().authenticated()
                 );
-        // 커스텀 필터 등록
-        // 로그인 경로 설정 후, 로그인 필터 등록
+        
+        // 커스텀 로그인 필터 등록
         CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter
                 = new CustomUsernamePasswordAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil);
         customUsernamePasswordAuthenticationFilter.setFilterProcessesUrl("/login");
         http.addFilterAt(customUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        // jwt 검증 필터 등록
+        
+        // JWT 인증 필터 등록
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil);
         http.addFilterAfter(jwtAuthenticationFilter, CustomUsernamePasswordAuthenticationFilter.class);
 
