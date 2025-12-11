@@ -39,3 +39,9 @@ server:
 logging:
   level:
     org.springframework: info
+  
+  config:
+    filename: app-stag
+    maxFileSize: 10MB
+    maxHistory: 30
+    totalSizeCap: 1GB

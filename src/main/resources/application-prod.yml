@@ -30,4 +30,10 @@ server:
 
 logging:
   level:
-    org.springframework: INFO
+    org.springframework: info
+  
+  config:
+    filename: app-prod 
+    maxFileSize: 50MB
+    maxHistory: 60
+    totalSizeCap: 5GB
