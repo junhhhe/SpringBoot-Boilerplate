@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 요청 헤더에서 토큰 추출
-        String token = request.getHeader("Authentication");
+        String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
             return;

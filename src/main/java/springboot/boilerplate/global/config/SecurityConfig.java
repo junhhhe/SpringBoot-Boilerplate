@@ -12,6 +12,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import springboot.boilerplate.global.security.CustomAccessDeniedHandler;
+import springboot.boilerplate.global.security.CustomAuthenticationEntryPoint;
 import springboot.boilerplate.global.security.CustomUsernamePasswordAuthenticationFilter;
 import springboot.boilerplate.global.security.JwtUtil;
 import springboot.boilerplate.global.security.JwtAuthenticationFilter;
@@ -24,6 +26,8 @@ public class SecurityConfig {
     // 인증 관리자 Bean을 얻기 위한 설정 객체 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
@@ -67,6 +71,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/onlyuser").hasRole("USER")
                         .anyRequest().authenticated()
+                )
+                // 인증/인가 에러 핸들러 설정
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)  // 인증 실패 시 (401)
+                        .accessDeniedHandler(customAccessDeniedHandler)            // 권한 없음 시 (403)
                 );
         
         // 커스텀 로그인 필터 등록
